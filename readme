@@ -1,0 +1,39 @@
+# SIC API
+
+API REST para sistema de cobranza desarrollada con:
+
+- PHP
+- MySQL / MariaDB
+- PDO
+- Stored Procedures
+- Arquitectura por capas
+
+## Características
+
+- Login
+- Gestión de usuarios
+- Clientes
+- Registro de deudas
+- Registro de pagos
+- Cobros del día
+- Cálculo de saldos
+
+## Arquitectura
+
+- Routes
+- Controllers
+- Services
+- Helpers
+
+## Tecnologías
+
+- PHP 8
+- MySQL
+- XAMPP
+
+## Próximamente
+
+- JWT
+- React Native App
+- Dashboard
+- Calendario
