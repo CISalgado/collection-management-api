@@ -12,6 +12,48 @@ class UserService {
         $this->conn = $database->connect();
     }
 
+    public function get($data) {
+
+        $query = "
+            SELECT
+                id_user,
+                user_firstname,
+                user_lastname1,
+                user_lastname2,
+                user_name
+            FROM ca_users
+            WHERE status = 1
+        ";
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getById($id, $data) {
+
+        $query = "
+            SELECT
+                id_user,
+                user_firstname,
+                user_lastname1,
+                user_lastname2,
+                user_name
+            FROM ca_users
+            WHERE status = 1
+            AND id_user = :id_user
+        ";
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->bindParam(':id_user', $id);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function create($data) {
 
         $password = password_hash(
