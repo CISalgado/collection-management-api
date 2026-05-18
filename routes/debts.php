@@ -19,6 +19,9 @@ switch($_SERVER['REQUEST_METHOD']) {
         break;
 
     case 'PUT':
+        if(!isset($id)) {
+            response(false, 'ID requerido', null, 400);
+        }
         $controller->update($id);
         break;
 
