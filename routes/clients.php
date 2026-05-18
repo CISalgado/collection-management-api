@@ -6,6 +6,14 @@ $controller = new ClientController();
 
 switch($_SERVER['REQUEST_METHOD']) {
 
+    case 'GET':
+        if(isset($id)) {
+            $controller->getById($id);
+        } else {
+            $controller->get();
+        }
+        break;
+
     case 'POST':
         $controller->create();
         break;
