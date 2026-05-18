@@ -9,8 +9,17 @@ $url = $_GET['url'] ?? '';
 $url = explode('/', trim($url, '/'));
 
 $route = $url[0] ?? null;
-$id = $url[1] ?? null;
-$action = $url[2] ?? null;
+$id = null;
+$action = null;
+
+if(isset($url[1])) {
+    if(is_numeric($url[1])) {
+        $id = $url[1];
+        $action = $url[2] ?? null;
+    } else {
+        $action = $url[1];
+    }
+}
 
 switch($route) {
 
