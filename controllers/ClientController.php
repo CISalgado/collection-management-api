@@ -45,6 +45,23 @@ class ClientController {
         }
     }
 
+    public function accountStatement($id) {
+
+        try {
+
+            $data = json_decode(file_get_contents("php://input"));
+            
+            $result = $this->service->accountStatement($id, $data);
+
+            response(true, 'Estado de cuenta encontrado', $result);
+
+        } catch(Exception $e) {
+
+            response(false, $e->getMessage(), null, 500);
+
+        }
+    }
+
     public function create() {
 
         try {

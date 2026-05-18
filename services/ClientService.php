@@ -22,7 +22,7 @@ class ClientService {
                 client_lastname2,
                 client_collectionmethod,
                 client_collectionday
-            FROM ca_clients
+            FROM ca_client
             WHERE status = 1
         ";
 
@@ -43,7 +43,7 @@ class ClientService {
                 client_lastname2,
                 client_collectionmethod,
                 client_collectionday
-            FROM ca_clients
+            FROM ca_client
             WHERE status = 1
             AND id_client = :id_client
         ";
@@ -56,10 +56,37 @@ class ClientService {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function accountStatement($id, $data) {
+    
+        $query = "
+            CALL sp_estado_cuenta_cliente(:id_client);
+        ";
+    
+        $stmt = $this->conn->prepare($query);
+    
+        $stmt->bindParam(':id_client', $id);
+    
+        $stmt->execute();
+    
+        // Primer resultado -> historial
+        $movements = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        // Pasar al siguiente SELECT del SP
+        $stmt->nextRowset();
+    
+        // Segundo resultado -> resumen
+        $summary = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        return [
+            'movements' => $movements,
+            'summary' => $summary
+        ];
+    }
+
     public function create($data) {
 
         $query = "
-            INSERT INTO ca_clients (
+            INSERT INTO ca_client (
                 client_firstname,
                 client_lastname1,
                 client_lastname2,
@@ -101,7 +128,7 @@ class ClientService {
 
         $checkQuery = "
             SELECT id_client
-            FROM ca_clients
+            FROM ca_client
             WHERE id_client = :id_client
             LIMIT 1
         ";
@@ -117,7 +144,7 @@ class ClientService {
         }
     
         $query = "
-            UPDATE ca_clients
+            UPDATE ca_client
             SET
                 user_firstname = :firstname,
                 user_lastname1 = :lastname1,

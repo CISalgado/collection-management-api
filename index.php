@@ -6,10 +6,11 @@ require_once './helpers/response.php';
 
 $url = $_GET['url'] ?? '';
 
-$url = explode('/', $url);
+$url = explode('/', trim($url, '/'));
 
-$route = $url[0] ?? '';
+$route = $url[0] ?? null;
 $id = $url[1] ?? null;
+$action = $url[2] ?? null;
 
 switch($route) {
 

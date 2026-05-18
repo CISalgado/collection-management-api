@@ -7,7 +7,9 @@ $controller = new ClientController();
 switch($_SERVER['REQUEST_METHOD']) {
 
     case 'GET':
-        if(isset($id)) {
+        if(isset($id) && $action === 'account-statement') {
+            $controller->accountStatement($id);
+        } else if(isset($id)) {
             $controller->getById($id);
         } else {
             $controller->get();
@@ -19,6 +21,9 @@ switch($_SERVER['REQUEST_METHOD']) {
         break;
 
     case 'PUT':
+        if(!isset($id)) {
+            response(false, 'ID requerido', null, 400);
+        }
         $controller->update($id);
         break;
 
