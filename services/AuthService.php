@@ -1,6 +1,7 @@
 <?php
 
 require_once './config/database.php';
+require_once './helpers/jwt.php';
 
 class AuthService {
 
@@ -43,6 +44,17 @@ class AuthService {
 
         unset($user['user_password']);
 
-        return $user;
+        $token = generateJWT([
+            'id_user' => $user['id_user'],
+            'user_name' => $user['user_name']
+        ]);
+        
+        return [
+            'token' => $token,
+            'user' => [
+                'id_user' => $user['id_user'],
+                'user_name' => $user['user_name']
+            ]
+        ];
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
 require_once './controllers/UserController.php';
+require_once './middlewares/authMiddleware.php';
+authenticate();
 
 $controller = new UserController();
 

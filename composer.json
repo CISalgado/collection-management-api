@@ -1,0 +1,15 @@
+{
+    "name": "pc/sic-api",
+    "autoload": {
+        "psr-4": {
+            "Pc\\SicApi\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Cristopher Israel",
+            "email": "134570889+CISalgado@users.noreply.github.com"
+        }
+    ],
+    "require": {}
+}
