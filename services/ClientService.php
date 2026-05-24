@@ -21,7 +21,21 @@ class ClientService {
                 client_lastname1,
                 client_lastname2,
                 client_collectionmethod,
-                client_collectionday
+                CASE 
+                    WHEN client_collectionmethod = 1 THEN 'Semanal'
+                    WHEN client_collectionmethod = 2 THEN 'Quincenal'
+                    WHEN client_collectionmethod = 3 THEN 'Mensual'
+                    ELSE 'Otro'
+                END AS client_collectionmethod,
+                CASE 
+                    WHEN client_collectionday = 1 THEN 'Lunes'
+                    WHEN client_collectionday = 2 THEN 'Martes'
+                    WHEN client_collectionday = 3 THEN 'Miércoles'
+                    WHEN client_collectionday = 4 THEN 'Jueves'
+                    WHEN client_collectionday = 5 THEN 'Viernes'
+                    WHEN client_collectionday = 6 THEN 'Sábado'
+                    ELSE 'Domingo'
+                END AS client_collectionday
             FROM ca_client
             WHERE status = 1
         ";
