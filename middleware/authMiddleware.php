@@ -1,20 +1,27 @@
 <?php
-
+require_once './helpers/response.php';
 require_once './helpers/jwt.php';
 
 function authenticate() {
 
     $headers = getallheaders();
 
-    if(!isset($headers['Authorization'])) {
+    $authHeader =
+        $headers['Authorization']
+        ?? $headers['authorization']
+        ?? ($_SERVER['HTTP_AUTHORIZATION'] ?? null);
+
+    if(!$authHeader) {
+
         response(false, 'Token requerido', null, 401);
+
         exit;
     }
 
     $token = str_replace(
         'Bearer ',
         '',
-        $headers['Authorization']
+        $authHeader
     );
 
     try {
@@ -26,6 +33,7 @@ function authenticate() {
     } catch(Exception $e) {
 
         response(false, 'Token inválido', null, 401);
+
         exit;
     }
 }
