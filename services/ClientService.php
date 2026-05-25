@@ -20,21 +20,27 @@ class ClientService {
                 client_firstname,
                 client_lastname1,
                 client_lastname2,
-                client_collectionmethod,
+                client_phone,
+                client_direction,
                 CASE 
                     WHEN client_collectionmethod = 1 THEN 'Semanal'
                     WHEN client_collectionmethod = 2 THEN 'Quincenal'
                     WHEN client_collectionmethod = 3 THEN 'Mensual'
                     ELSE 'Otro'
                 END AS client_collectionmethod,
-                CASE 
-                    WHEN client_collectionday = 1 THEN 'Lunes'
-                    WHEN client_collectionday = 2 THEN 'Martes'
-                    WHEN client_collectionday = 3 THEN 'Miércoles'
-                    WHEN client_collectionday = 4 THEN 'Jueves'
-                    WHEN client_collectionday = 5 THEN 'Viernes'
-                    WHEN client_collectionday = 6 THEN 'Sábado'
-                    ELSE 'Domingo'
+                CASE
+                    WHEN  client_collectionmethod = 1 THEN 
+                        CASE 
+                            WHEN client_collectionday = 1 THEN 'Lunes'
+                            WHEN client_collectionday = 2 THEN 'Martes'
+                            WHEN client_collectionday = 3 THEN 'Miércoles'
+                            WHEN client_collectionday = 4 THEN 'Jueves'
+                            WHEN client_collectionday = 5 THEN 'Viernes'
+                            WHEN client_collectionday = 6 THEN 'Sábado'
+                            WHEN client_collectionday = 7 THEN 'Domingo'
+                            ELSE 'Otro'
+                        END
+                    ELSE client_collectionday
                 END AS client_collectionday
             FROM ca_client
             WHERE status = 1
@@ -55,8 +61,28 @@ class ClientService {
                 client_firstname,
                 client_lastname1,
                 client_lastname2,
-                client_collectionmethod,
-                client_collectionday
+                client_phone,
+                client_direction,
+                CASE 
+                    WHEN client_collectionmethod = 1 THEN 'Semanal'
+                    WHEN client_collectionmethod = 2 THEN 'Quincenal'
+                    WHEN client_collectionmethod = 3 THEN 'Mensual'
+                    ELSE 'Otro'
+                END AS client_collectionmethod,
+                CASE
+                    WHEN  client_collectionmethod = 1 THEN 
+                        CASE 
+                            WHEN client_collectionday = 1 THEN 'Lunes'
+                            WHEN client_collectionday = 2 THEN 'Martes'
+                            WHEN client_collectionday = 3 THEN 'Miércoles'
+                            WHEN client_collectionday = 4 THEN 'Jueves'
+                            WHEN client_collectionday = 5 THEN 'Viernes'
+                            WHEN client_collectionday = 6 THEN 'Sábado'
+                            WHEN client_collectionday = 7 THEN 'Domingo'
+                            ELSE 'Otro'
+                        END
+                    ELSE client_collectionday
+                END AS client_collectionday
             FROM ca_client
             WHERE status = 1
             AND id_client = :id_client
@@ -82,18 +108,15 @@ class ClientService {
     
         $stmt->execute();
     
-        // Primer resultado -> historial
         $movements = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-        // Pasar al siguiente SELECT del SP
         $stmt->nextRowset();
     
-        // Segundo resultado -> resumen
-        $summary = $stmt->fetch(PDO::FETCH_ASSOC);
+        $balance = $stmt->fetch(PDO::FETCH_ASSOC);
     
         return [
             'movements' => $movements,
-            'summary' => $summary
+            'balance' => $balance['saldo']
         ];
     }
 
@@ -106,16 +129,20 @@ class ClientService {
                 client_lastname2,
                 client_collectionmethod,
                 client_collectionday,
+                client_phone,
+                client_direction,
                 status,
                 create_iduser,
                 create_date
             )
             VALUES (
-                :firstname,
-                :lastname1,
-                :lastname2,
-                :collectionmethod,
-                :collectionday,
+                :client_firstname,
+                :client_lastname1,
+                :client_lastname2,
+                :client_collectionmethod,
+                :client_collectionday,
+                :client_phone,
+                :client_direction,
                 1,
                 :create_iduser,
                 NOW()
@@ -124,11 +151,19 @@ class ClientService {
 
         $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(':firstname', $data->client_firstname);
-        $stmt->bindParam(':lastname1', $data->client_lastname1);
-        $stmt->bindParam(':lastname2', $data->client_lastname2);
-        $stmt->bindParam(':collectionmethod', $data->client_collectionmethod);
-        $stmt->bindParam(':collectionday', $data->client_collectionday);
+        $stmt->bindParam(':client_firstname', $data->client_firstname);
+        $stmt->bindParam(':client_lastname1', $data->client_lastname1);
+        $stmt->bindParam(':client_lastname2', $data->client_lastname2);
+        $stmt->bindParam(':client_collectionmethod', $data->client_collectionmethod);
+        $stmt->bindParam(':client_collectionday', $data->client_collectionday);
+
+        // Campos opcionales
+        $phone = $data->client_phone ?? null;
+        $direction = $data->client_direction ?? null;
+
+        $stmt->bindParam(':client_phone', $phone);
+        $stmt->bindParam(':client_direction', $direction);
+
         $stmt->bindParam(':create_iduser', $data->create_iduser);
 
         $stmt->execute();
@@ -160,10 +195,13 @@ class ClientService {
         $query = "
             UPDATE ca_client
             SET
-                user_firstname = :firstname,
-                user_lastname1 = :lastname1,
-                user_lastname2 = :lastname2,
-                user_name = :username,
+                client_firstname = :client_firstname,
+                client_lastname1 = :client_lastname1,
+                client_lastname2 = :client_lastname2,
+                client_phone = :client_phone,
+                client_direction = :client_direction,
+                client_collectionmethod = :client_collectionmethod,
+                client_collectionday = :client_collectionday,
                 update_iduser = :update_iduser,
                 update_date = NOW()
         ";
@@ -174,12 +212,20 @@ class ClientService {
 
         $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(':firstname', $data->user_firstname);
-        $stmt->bindParam(':lastname1', $data->user_lastname1);
-        $stmt->bindParam(':lastname2', $data->user_lastname2);
-        $stmt->bindParam(':username', $data->user_name);
+        $stmt->bindParam(':client_firstname', $data->client_firstname);
+        $stmt->bindParam(':client_lastname1', $data->client_lastname1);
+        $stmt->bindParam(':client_lastname2', $data->client_lastname2);
+        $stmt->bindParam(':client_collectionmethod', $data->client_collectionmethod);
+        $stmt->bindParam(':client_collectionday', $data->client_collectionday);
         $stmt->bindParam(':update_iduser', $data->update_iduser);
         $stmt->bindParam(':id_client', $id);
+
+        // Campos opcionales
+        $phone = $data->client_phone ?? null;
+        $direction = $data->client_direction ?? null;
+
+        $stmt->bindParam(':client_phone', $phone);
+        $stmt->bindParam(':client_direction', $direction);
 
         $stmt->execute();
 
