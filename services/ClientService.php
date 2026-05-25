@@ -29,7 +29,7 @@ class ClientService {
                     ELSE 'Otro'
                 END AS client_collectionmethod,
                 CASE
-                    WHEN  client_collectionmethod = 1 THEN 
+                    WHEN client_collectionmethod = 1 THEN 
                         CASE 
                             WHEN client_collectionday = 1 THEN 'Lunes'
                             WHEN client_collectionday = 2 THEN 'Martes'
@@ -40,7 +40,15 @@ class ClientService {
                             WHEN client_collectionday = 7 THEN 'Domingo'
                             ELSE 'Otro'
                         END
-                    ELSE client_collectionday
+                    WHEN client_collectionmethod = 2 THEN
+                        CONCAT(
+                            client_collectionday,
+                            ' y ',
+                            client_collectionday + 15
+                        )
+                    WHEN client_collectionmethod = 3 THEN
+                        CONCAT('Día ', client_collectionday)
+                    ELSE NULL
                 END AS client_collectionday
             FROM ca_client
             WHERE status = 1
@@ -70,7 +78,7 @@ class ClientService {
                     ELSE 'Otro'
                 END AS client_collectionmethod,
                 CASE
-                    WHEN  client_collectionmethod = 1 THEN 
+                    WHEN client_collectionmethod = 1 THEN 
                         CASE 
                             WHEN client_collectionday = 1 THEN 'Lunes'
                             WHEN client_collectionday = 2 THEN 'Martes'
@@ -81,7 +89,15 @@ class ClientService {
                             WHEN client_collectionday = 7 THEN 'Domingo'
                             ELSE 'Otro'
                         END
-                    ELSE client_collectionday
+                    WHEN client_collectionmethod = 2 THEN
+                        CONCAT(
+                            client_collectionday,
+                            ' y ',
+                            client_collectionday + 15
+                        )
+                    WHEN client_collectionmethod = 3 THEN
+                        CONCAT('Día ', client_collectionday)
+                    ELSE NULL
                 END AS client_collectionday
             FROM ca_client
             WHERE status = 1
